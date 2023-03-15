@@ -16,12 +16,14 @@ def ingredient_create(row):
         measurement_unit=row[1],
     )
 
+
 def tag_create(row):
     Tag.objects.get_or_create(
         name=row[0],
         color=row[1],
         slug=row[2],
     )
+
 
 action = {
     'ingredients.csv': ingredient_create,

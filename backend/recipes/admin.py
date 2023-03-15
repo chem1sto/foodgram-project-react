@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
 
 from recipes.models import (FavoriteRecipe, Ingredient, IngredientToRecipe,
-                            Recipe, Shopping_cart, Tag, TagToRecipe)
+                            Recipe, ShoppingCart, Tag, TagToRecipe)
 from users.models import CustomUser, Subscription
 
 
@@ -100,7 +100,7 @@ class FavoriteRecipeAdmin(admin.ModelAdmin):
     empty_value_display = settings.EMPTY_VALUE_DISPLAY
 
 
-@admin.register(Shopping_cart)
+@admin.register(ShoppingCart)
 class Shopping_cartAdmin(admin.ModelAdmin):
     list_display = ('recipe', 'user', 'add_date')
     search_fields = ('user',)

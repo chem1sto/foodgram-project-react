@@ -16,6 +16,7 @@ def tag_regex_validator(value):
         raise ValidationError(MESSAGE_REGEX.format(invalid_simbols))
     return value
 
+
 def tag_color_validator(value):
     try:
         data = webcolors.hex_to_name(value)
