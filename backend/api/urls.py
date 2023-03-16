@@ -13,8 +13,8 @@ router_api.register(r'recipes', RecipeViewSet)
 router_api.register(r'tags', TagViewSet)
 
 auth_token_urls = [
-    path('login/', TokenCreateView.as_view()),
-    path('logout/', TokenDestroyView.as_view()),
+    path('login/', TokenCreateView.as_view(), name='login'),
+    path('logout/', TokenDestroyView.as_view(), name='logout')
 ]
 
 urlpatterns = [

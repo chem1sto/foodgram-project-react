@@ -2,6 +2,7 @@ import io
 
 from django.conf import settings
 from django.db.models import Sum
+from django_filters.rest_framework import DjangoFilterBackend
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -17,7 +18,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-
 from api.permissions import (IsAdminPermission,
                              IsAdminOrAuthorOrReadOnlyPermission)
 from api.serializers import (IngredientSerializer, RecipeCreateSerializer,
@@ -25,6 +25,7 @@ from api.serializers import (IngredientSerializer, RecipeCreateSerializer,
                              SetPasswordSerializer, SignUpUserSerializer,
                              SubscriptionSerializer, TagSerializer,
                              UserProfileSerializer)
+from api.filters import RecipeFilter
 from api.utils import post, delete
 from recipes.models import (FavoriteRecipe, Ingredient, Recipe, ShoppingCart,
                             Tag)
@@ -181,6 +182,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthenticated,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         '''Выбор сериализатора в зависимости от запроса.'''
