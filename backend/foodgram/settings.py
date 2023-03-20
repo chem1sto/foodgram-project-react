@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
 
@@ -97,7 +97,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'backend_media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ('http://51.250.2.221','http://localhost')
+CSRF_TRUSTED_ORIGINS = ('http://chemisto-blog.ddns.net','http://localhost')
 
 AUTH_USER_MODEL = 'users.CustomUser'
 

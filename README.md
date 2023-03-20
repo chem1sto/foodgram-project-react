@@ -40,6 +40,9 @@
   * На админ-странице рецепта отображается общее число добавлений этого рецепта в избранное
   * Для модели ингредиентов включена фильтрация по названию
 
+**Проект доступен [по адресу](http://chemisto-blog.ddns.net/)**
+**Документация по проекту доступна [по адресу](http://chemisto-blog.ddns.net/api/docs/)**
+
 ### Технологии
 - Python 3.10.6
 - Django 4.1.7
@@ -53,8 +56,7 @@
 - Docker 20.10.23
 - Docker Compose 2.15.1
 
-
-## **Как запустить проект**
+## **Как запустить проект на локальном компьютере**
 1. Клонируйте репозиторий:
 ```
 git@github.com:chem1sto/foodgram-project-react.git
@@ -92,7 +94,7 @@ docker compose exec backend python manage.py makemigrations users recipes
 ```
 docker compose exec backend python manage.py migrate
 ```
-8. Загрузить в базу данные из CSV-файлов:
+8. Загрузите в базу данные из CSV-файлов:
 ```
 python manage.py upload ingredients.csv tags.csv recipes.csv
 ```
@@ -108,6 +110,59 @@ docker compose exec backend python manage.py createsuperuser
 
 ## **Документация**
 Доступна после запуска сервера: [Redoc](http://localhost/api/docs/redoc.html).
+
+## **Как запустить проект на удалённом сервере**
+1. Клонируйте репозиторий:
+```
+git@github.com:chem1sto/foodgram-project-react.git
+```
+2. Установите на сервере Docker, Docker Compose:
+
+```
+sudo apt install curl                                   # установка утилиты для скачивания файлов
+curl -fsSL https://get.docker.com -o get-docker.sh      # скачать скрипт для установки
+sh get-docker.sh                                        # запуск скрипта
+sudo apt-get install docker-compose-plugin              # последняя версия docker compose
+```
+3. На сервере перейдите в папку foodgram-project-react/infra/
+```
+cd foodgram-project-react/infra/
+```
+4. Создайте и запустите контейнеры Docker, выполнив команду на сервере:
+*(версии команд "docker compose" или "docker-compose" отличаются в зависимости от установленной версии Docker Compose):*
+```
+sudo docker compose up -d
+```
+5. Выполните миграции:
+```
+docker compose exec backend python manage.py makemigrations users recipes
+```
+```
+docker compose exec backend python manage.py migrate
+```
+6. Загрузите в базу данные из CSV-файлов:
+```
+python manage.py upload ingredients.csv tags.csv recipes.csv
+```
+7. Соберите все статические файлы в папку static:
+```
+docker compose exec backend python manage.py collectstatic --no-input 
+```
+8 Создайте суперпользователя:
+```
+docker compose exec backend python manage.py createsuperuser
+```
+9. Приложение активно и готово к использованию.
+
+10. Для остановки контейнеров Docker:
+```
+sudo docker compose stop
+```
+11. Для удаления контейнеров Docker:
+```
+sudo docker compose down -v      # с удалением контейнеров и volumes
+sudo docker compose down         # без удаления volumes
+```
 
 ### Автор
 - Владимир Васильев | [chem1sto](https://github.com/chem1sto)
