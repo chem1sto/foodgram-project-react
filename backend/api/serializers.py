@@ -300,9 +300,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, recipe):
-        recipe_name = recipe.get('name')
-        if Recipe.objects.filter(name=recipe_name).exists():
-            raise serializers.ValidationError(_('Имя рецепта не уникально.'))
         ingred_to_recipe = recipe.get('ingredient_to_recipe')
         ingred_list = [ingred['ingredient_id'] for ingred in ingred_to_recipe]
         if len(ingred_list) != len(set(ingred_list)):
@@ -313,6 +310,12 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context['request']
+        if request.user.recipes.filter(
+            name=validated_data.get('name')
+        ).exists():
+            raise serializers.ValidationError(
+                _('Рецепт с таким именем уже существует.')
+            )
         ingredients = validated_data.pop('ingredient_to_recipe')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(
