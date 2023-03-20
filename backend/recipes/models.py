@@ -7,6 +7,11 @@ from recipes.validators import tag_regex_validator, tag_color_validator
 from users.models import CustomUser
 
 
+Enum = (
+    (0, False),
+    (1, True),
+)
+
 class Ingredient(models.Model):
     """Модель ингредиентов."""
     name = models.CharField(
@@ -77,7 +82,7 @@ class Recipe(models.Model):
         verbose_name=_('теги'),
         to=Tag,
         through='TagToRecipe',
-        related_name='for_recipe'
+        related_name='tags_for_recipe'
     )
     image = models.ImageField(
         verbose_name=_('изображение'),

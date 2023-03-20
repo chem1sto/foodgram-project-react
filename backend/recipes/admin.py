@@ -49,7 +49,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'created',
         'image',
         'cooking_time',
-        'count_favorites'
+        'count_favorites',
     )
     search_fields = ('username', 'email', 'first_name', 'last_name')
     list_filter = ('author', 'name', 'tags')

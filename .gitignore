@@ -135,7 +135,7 @@ dmypy.json
 .vscode/
 
 # media
-media/
+backend_media/
 
 # migrations
 **/migrations/

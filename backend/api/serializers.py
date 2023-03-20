@@ -97,11 +97,7 @@ class RecipeShortReadSerializer(serializers.ModelSerializer):
 class SubscriptionSerializer(serializers.ModelSerializer):
     """Сериализатор для вывода информации о подписке пользователя."""
     is_subscribed = serializers.SerializerMethodField(default=False)
-    recipes = RecipeShortReadSerializer(
-        source='own_recipe',
-        read_only=True,
-        many=True
-    )
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -124,6 +120,14 @@ class SubscriptionSerializer(serializers.ModelSerializer):
                 subscribing=subscribing
             ).exists()
         return False
+
+    def get_recipes(self, subscriber):
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
+        author_recipes = Recipe.objects.filter(author=subscriber)
+        if limit:
+            author_recipes = author_recipes[:int(limit)]
+        return RecipeShortReadSerializer(author_recipes, many=True).data
 
     def get_recipes_count(self, subscribing):
         return Recipe.objects.filter(author=subscribing).count()

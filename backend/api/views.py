@@ -25,7 +25,7 @@ from api.serializers import (IngredientSerializer, RecipeCreateSerializer,
                              SetPasswordSerializer, SignUpUserSerializer,
                              SubscriptionSerializer, TagSerializer,
                              UserProfileSerializer)
-from api.filters import RecipeFilter
+from api.filters import IngredientFilter, RecipeFilter
 from api.utils import post, delete
 from recipes.models import (FavoriteRecipe, Ingredient, Recipe, ShoppingCart,
                             Tag)
@@ -161,6 +161,8 @@ class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
     pagination_class = None
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = IngredientFilter
 
     def get_permissions(self):
         """
@@ -184,6 +186,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
+
 
     def get_serializer_class(self):
         '''Выбор сериализатора в зависимости от запроса.'''
@@ -234,7 +237,9 @@ class TagViewSet(viewsets.ModelViewSet):
     """
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    pagination_class = None
     permission_classes = (AllowAny,)
+
 
     def get_permissions(self):
         """
@@ -261,16 +266,16 @@ class ShoppingCardView(APIView):
         pdf = canvas.Canvas(buffer, pagesize=A4, bottomup=0)
         font = 'Tantular'
         pdfmetrics.registerFont(
-            TTFont('Tantular', 'backend/static/fonts/Tantular.ttf', 'UTF-8')
+            TTFont('Tantular', 'backend_static/fonts/Tantular.ttf', 'UTF-8')
         )
         textobj = pdf.beginText()
         textobj.setTextOrigin(inch, inch)
-        textobj.setFont(font, 12)
         lines = []
-        lines.append('Список покупок:')
+        lines.append('Ваш список ингредиентов для выбранных рецептов:')
+        textobj.setFont(font, 14)
         lines.append('-' * settings.DIVIDING_LINE_LENGTH)
         for i, recipe in enumerate(recipes_in_shopping_list, start=1):
-            lines.append(f'{i}. {recipe[0]} ({recipe[1]}) - {recipe[2]}')
+            lines.append(f'{i}. {recipe[0].capitalize()} ({recipe[1]}) - {recipe[2]}')
             lines.append(' ')
         for line in lines:
             textobj.textLine(line)
