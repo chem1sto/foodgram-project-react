@@ -7,11 +7,6 @@ from recipes.validators import tag_regex_validator, tag_color_validator
 from users.models import CustomUser
 
 
-Enum = (
-    (0, False),
-    (1, True),
-)
-
 class Ingredient(models.Model):
     """Модель ингредиентов."""
     name = models.CharField(

@@ -46,6 +46,7 @@ class CustomUser(AbstractUser):
 
 
 class Subscription(models.Model):
+    """Модель подписок пользователей."""
     subscriber = models.ForeignKey(
         verbose_name=_('подписчик'),
         to=CustomUser,

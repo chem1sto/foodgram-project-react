@@ -6,6 +6,7 @@ from recipes.models import Recipe
 
 
 def post(request, pk, model, serializer):
+    """Обработка POST-запроса для списков "Избранное" или списков покупок."""
     recipe = get_object_or_404(Recipe, pk=pk)
     if model.objects.filter(user=request.user, recipe=recipe).exists():
         return Response(
@@ -21,6 +22,7 @@ def post(request, pk, model, serializer):
 
 
 def delete(request, pk, model):
+    """Обработка DELETE-запроса для списков "Избранное" или списков покупок."""
     recipe = get_object_or_404(Recipe, pk=pk)
     if model.objects.filter(user=request.user, recipe=recipe).exists():
         obj = get_object_or_404(

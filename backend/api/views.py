@@ -49,15 +49,13 @@ class CustomUserViewSet(
     permission_classes = (AllowAny,)
 
     def get_serializer_class(self):
-        '''Выбо сериализатора в зависимости от запроса.'''
+        '''Выбор сериализатора в зависимости от запроса.'''
         if self.action in ('list', 'retrieve'):
             return UserProfileSerializer
         return SignUpUserSerializer
 
     def get_permissions(self):
-        """
-        Выбор уровня доступа для пользователя в зависимости от запроса.
-        """
+        """Выбор уровня доступа для пользователя в зависимости от запроса."""
         if self.action == 'retrieve':
             self.permission_classes = (IsAdminOrAuthorOrReadOnlyPermission,)
         elif self.action == 'destroy':
@@ -165,9 +163,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
     filterset_class = IngredientFilter
 
     def get_permissions(self):
-        """
-        Выбор уровня доступа для пользователя в зависимости от запроса.
-        """
+        """Выбор уровня доступа для пользователя в зависимости от запроса."""
         if self.action in ('create', 'update', 'destroy'):
             self.permission_classes = (IsAdminPermission,)
         return [permission() for permission in self.permission_classes]
@@ -187,7 +183,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
-
     def get_serializer_class(self):
         '''Выбор сериализатора в зависимости от запроса.'''
         if self.action in ('list', 'retrieve'):
@@ -195,9 +190,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return RecipeCreateSerializer
 
     def get_permissions(self):
-        """
-        Выбор уровня доступа для пользователя в зависимости от запроса.
-        """
+        """Выбор уровня доступа для пользователя в зависимости от запроса."""
         if self.action in ('list', 'retrieve'):
             self.permission_classes = (AllowAny,)
         if self.action in ('create', 'update', 'destroy'):
@@ -221,6 +214,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         detail=True
     )
     def shopping_cart(self, request, pk):
+        """Добавление/удаление рецепта из списка покупок."""
         if request.method == 'POST':
             return post(request, pk, ShoppingCart, RecipeShortReadSerializer)
         return delete(request, pk, ShoppingCart)
@@ -240,11 +234,8 @@ class TagViewSet(viewsets.ModelViewSet):
     pagination_class = None
     permission_classes = (AllowAny,)
 
-
     def get_permissions(self):
-        """
-        Выбор уровня доступа для пользователя в зависимости от запроса.
-        """
+        """Выбор уровня доступа для пользователя в зависимости от запроса."""
         if self.action in ('create', 'update', 'destroy'):
             self.permission_classes = (IsAdminPermission,)
         return [permission() for permission in self.permission_classes]
@@ -252,7 +243,9 @@ class TagViewSet(viewsets.ModelViewSet):
 
 @action(detail=False, permission_classes=(IsAuthenticated,))
 class ShoppingCardView(APIView):
+    """View-функция API для получения списка покупок в виде pdf-файла."""
     def get(self, request):
+        """Обработка GET-запроса для получения списка покупок в виде pdf."""
         recipes_in_shopping_list = Recipe.objects.filter(
             recipe_on_shopping_cart__user=request.user
         ).annotate(
@@ -275,7 +268,9 @@ class ShoppingCardView(APIView):
         textobj.setFont(font, 14)
         lines.append('-' * settings.DIVIDING_LINE_LENGTH)
         for i, recipe in enumerate(recipes_in_shopping_list, start=1):
-            lines.append(f'{i}. {recipe[0].capitalize()} ({recipe[1]}) - {recipe[2]}')
+            lines.append(
+                f'{i}. {recipe[0].capitalize()} ({recipe[1]}) - {recipe[2]}'
+            )
             lines.append(' ')
         for line in lines:
             textobj.textLine(line)

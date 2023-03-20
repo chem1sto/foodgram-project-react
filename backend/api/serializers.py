@@ -42,6 +42,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_is_subscribed(self, subscribing):
+        '''Получение значения для поля пользователя is_subscribed.'''
         if self.context.get('request') and not (
             self.context.get('request').user.is_anonymous
         ):
@@ -69,15 +70,18 @@ class SetPasswordSerializer(serializers.Serializer):
         fields = ('new_password', 'current_password')
 
     def validate_current_password(self, value):
+        '''Валидация значения current_password.'''
         if not self.context['request'].user.check_password(value):
             raise serializers.ValidationError(_('Указан неправильный пароль.'))
         return value
 
     def validate_new_password(self, value):
+        '''Валидация значения new_password.'''
         validate_password(value)
         return value
 
     def save(self):
+        '''Переопределение метода save сериализатора.'''
         password = self.validated_data['new_password']
         user = self.context['request'].user
         user.set_password(password)
@@ -114,6 +118,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, subscribing):
+        '''Получение значения для поля подписки пользователя is_subscribed.'''
         if self.context.get('request'):
             return Subscription.objects.filter(
                 subscriber=self.context.get('request').user.id,
@@ -122,6 +127,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         return False
 
     def get_recipes(self, subscriber):
+        '''Получение рецептов автора с выводом нужного количества рецептов.'''
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
         author_recipes = Recipe.objects.filter(author=subscriber)
@@ -130,9 +136,11 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         return RecipeShortReadSerializer(author_recipes, many=True).data
 
     def get_recipes_count(self, subscribing):
+        '''Получение количества рецептов автора.'''
         return Recipe.objects.filter(author=subscribing).count()
 
     def validate(self, data):
+        '''Валидация данных о подписке в зависимости от метода запроса.'''
         request = self.context.get('request')
         if request.method == 'DELETE':
             return data
@@ -203,16 +211,14 @@ class IngredientToRecipeReadSerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для получения данных о теге.
-    """
+    """Сериализатор для получения данных о теге."""
     class Meta:
         model = Tag
         fields = ('id', 'name', 'color', 'slug')
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
-    """Сериализатор..."""
+    """Сериализатор для вывода информации о рецепте."""
     ingredients = IngredientToRecipeReadSerializer(
         source='recipe_to_ingredient',
         many=True
@@ -246,12 +252,14 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         )
 
     def get_is_favorited(self, recipe):
+        '''Получение значения для поля рецепта is_subscribed.'''
         return FavoriteRecipe.objects.filter(
             user=self.context.get('request').user,
             recipe=recipe
         ).exists()
 
     def get_is_in_shopping_cart(self, recipe):
+        '''Получение значения для поля рецепта is_in_shopping_cart.'''
         return ShoppingCart.objects.filter(
             user=self.context.get('request').user,
             recipe=recipe
@@ -259,7 +267,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
-    """Сериализатор для получения данных о рецепте."""
+    """Сериализатор для создания нового рецепта."""
     ingredients = IngredientToRecipeSerializer(
         source='ingredient_to_recipe',
         many=True,
@@ -300,6 +308,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, recipe):
+        '''Валидация данных рецепта.'''
         ingred_to_recipe = recipe.get('ingredient_to_recipe')
         ingred_list = [ingred['ingredient_id'] for ingred in ingred_to_recipe]
         if len(ingred_list) != len(set(ingred_list)):
@@ -309,6 +318,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return super().validate(recipe)
 
     def create(self, validated_data):
+        '''Переопределение метода create для создания нового рецепта.'''
         request = self.context['request']
         if request.user.recipes.filter(
             name=validated_data.get('name')
@@ -326,6 +336,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, recipe, validated_data):
+        '''Переопределение метода update для обновления данных о рецепте.'''
         ingredients = validated_data.pop('ingredient_to_recipe')
         tags = validated_data.pop('tags')
         IngredientToRecipe.objects.filter(
@@ -343,6 +354,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def add_entries_to_related_models(recipe, ingredients, tags):
+        '''
+        Статический метод для создания/обновления рецепта в связанных таблицах.
+        '''
         TagToRecipe.objects.bulk_create(
             TagToRecipe(
                 recipe=recipe,
@@ -362,6 +376,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         )
 
     def to_representation(self, instance):
+        '''
+        Переопределение метода сериализатора to_representation
+        для вывода данных о новом/обновленном рецепте.
+        '''
         serializer = RecipeReadSerializer(
             instance=instance,
             context={'request': self.context.get('request')}

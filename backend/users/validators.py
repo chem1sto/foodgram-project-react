@@ -8,6 +8,7 @@ USERNAME_REGEX = r'([\w.@+-]+)'
 
 
 def regex_validator(value):
+    """Валидация вводимых символов для имени пользователя."""
     invalid_simbols = ''.join(set(re.sub(USERNAME_REGEX, '', str(value))))
     if invalid_simbols:
         raise ValidationError(MESSAGE_REGEX.format(invalid_simbols))

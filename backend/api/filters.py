@@ -17,7 +17,10 @@ class IngredientFilter(FilterSet):
 
 
 class RecipeFilter(FilterSet):
-    """Фильтр для поиска рецептов по тегам."""
+    """
+    Фильтр для поиска рецептов по тегам
+    и полям is_favorited и is_in_shopping_cart.
+    """
     tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',
@@ -38,11 +41,17 @@ class RecipeFilter(FilterSet):
         fields = ('tags', 'author')
 
     def get_is_favorited(self, queryset, name, value):
+        """Фильтрация очереди рецептов по полю is_favorited."""
         if self.request.user.is_authenticated and value:
-            return queryset.filter(favorite_recipe__user=self.request.user)
+            return queryset.filter(
+                favorite_recipe__user=self.request.user
+            )
         return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
+        """Фильтрация очереди рецептов по полю is_in_shopping_cart."""
         if self.request.user.is_authenticated and value:
-            return queryset.filter(recipe_on_shopping_cart__user=self.request.user)
+            return queryset.filter(
+                recipe_on_shopping_cart__user=self.request.user
+            )
         return queryset.all()

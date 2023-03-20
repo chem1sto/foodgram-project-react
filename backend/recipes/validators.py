@@ -11,6 +11,7 @@ MESSAGE_NO_COLOR_NAME = _('Для этого цвета нет имени')
 
 
 def tag_regex_validator(value):
+    """Валидация вводимых символов для названия тега."""
     invalid_simbols = ''.join(set(re.sub(USERNAME_REGEX, '', str(value))))
     if invalid_simbols:
         raise ValidationError(MESSAGE_REGEX.format(invalid_simbols))
@@ -18,6 +19,7 @@ def tag_regex_validator(value):
 
 
 def tag_color_validator(value):
+    """Валидация hex-кодов цвета тегов."""
     try:
         data = webcolors.hex_to_name(value)
     except ValueError:

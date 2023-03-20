@@ -40,18 +40,18 @@ def recipe_create(row, author):
     recipe = Recipe.objects.get_or_create(
         author=author[0],
         image=ContentFile(base64.b64decode(row[27]), name='temp.' + ext),
-        name= row[28],
+        name=row[28],
         text=row[29],
         cooking_time=row[30]
     )
-    for i in range(0,22,2):
+    for i in range(0, 22, 2):
         if row[i] != 'нет':
             IngredientToRecipe.objects.get_or_create(
-                ingredient=ingredients[int(row[i])-1],
-                amount=row[i+1],
+                ingredient=ingredients[int(row[i]) - 1],
+                amount=row[i + 1],
                 recipe=recipe[0]
             )
-    for j in range(24,27):
+    for j in range(24, 27):
         if row[j] != 'нет':
             TagToRecipe.objects.get_or_create(
                 tag=tags[int(row[j])],
@@ -86,7 +86,7 @@ class Command(BaseCommand):
                         email='vasya@yandex.ru',
                         first_name='Вася',
                         last_name='Пупкин',
-                        password = make_password('password'),
+                        password=make_password('password'),
                         role='admin',
                     )
                     for row in reader:

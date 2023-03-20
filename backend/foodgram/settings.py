@@ -97,7 +97,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'backend_media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ('http://chemisto-blog.ddns.net','http://localhost')
+CSRF_TRUSTED_ORIGINS = ('http://chemisto-blog.ddns.net', 'http://localhost')
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
