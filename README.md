@@ -136,22 +136,22 @@ sudo docker compose up -d
 ```
 5. Выполните миграции:
 ```
-docker compose exec backend python manage.py makemigrations users recipes
+sudo docker compose exec backend python manage.py makemigrations users recipes
 ```
 ```
-docker compose exec backend python manage.py migrate
+sudo docker compose exec backend python manage.py migrate
 ```
 6. Загрузите в базу данные из CSV-файлов:
 ```
-python manage.py upload ingredients.csv tags.csv
+sudo python manage.py upload ingredients.csv tags.csv
 ```
 7. Соберите все статические файлы в папку static:
 ```
-docker compose exec backend python manage.py collectstatic --no-input 
+sudo docker compose exec backend python manage.py collectstatic --no-input 
 ```
 8 Создайте суперпользователя:
 ```
-docker compose exec backend python manage.py createsuperuser
+sudo docker compose exec backend python manage.py createsuperuser
 ```
 9. Приложение активно и готово к использованию.
 
