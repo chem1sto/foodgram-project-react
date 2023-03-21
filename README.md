@@ -97,7 +97,7 @@ docker compose exec backend python manage.py migrate
 ```
 8. Загрузите в базу данные из CSV-файлов:
 ```
-python manage.py upload ingredients.csv tags.csv recipes.csv
+python manage.py upload ingredients.csv tags.csv
 ```
 9. Соберите все статические файлы в папку static:
 ```
@@ -143,7 +143,7 @@ docker compose exec backend python manage.py migrate
 ```
 6. Загрузите в базу данные из CSV-файлов:
 ```
-python manage.py upload ingredients.csv tags.csv recipes.csv
+python manage.py upload ingredients.csv tags.csv
 ```
 7. Соберите все статические файлы в папку static:
 ```
