@@ -54,4 +54,4 @@ class RecipeFilter(FilterSet):
             return queryset.filter(
                 recipe_on_shopping_cart__user=self.request.user
             )
-        return queryset.all()
+        return queryset

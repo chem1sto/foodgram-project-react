@@ -253,17 +253,21 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, recipe):
         '''Получение значения для поля рецепта is_subscribed.'''
-        return FavoriteRecipe.objects.filter(
-            user=self.context.get('request').user,
-            recipe=recipe
-        ).exists()
+        if not self.context.get('request').user.is_anonymous:
+            return FavoriteRecipe.objects.filter(
+                user=self.context.get('request').user,
+                recipe=recipe
+            ).exists()
+        return False
 
     def get_is_in_shopping_cart(self, recipe):
         '''Получение значения для поля рецепта is_in_shopping_cart.'''
-        return ShoppingCart.objects.filter(
-            user=self.context.get('request').user,
-            recipe=recipe
-        ).exists()
+        if not self.context.get('request').user.is_anonymous:
+            return ShoppingCart.objects.filter(
+                user=self.context.get('request').user,
+                recipe=recipe
+            ).exists()
+        return False
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
@@ -320,7 +324,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         '''Переопределение метода create для создания нового рецепта.'''
         request = self.context['request']
-        if request.user.recipes.filter(
+        if request.user.own_recipe.filter(
             name=validated_data.get('name')
         ).exists():
             raise serializers.ValidationError(

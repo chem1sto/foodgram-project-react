@@ -16,7 +16,7 @@ services:
       - ./.env
 
   backend:
-    image: chemisto/foodgram_backend:v1.6
+    image: chemisto/foodgram_backend:v1.7
     restart: always
     volumes:
       - static_value:/app/backend_static/

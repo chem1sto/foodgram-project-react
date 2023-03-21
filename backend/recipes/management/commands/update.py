@@ -6,14 +6,8 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
-
-from recipes.models import (
-    Ingredient,
-    IngredientToRecipe,
-    Recipe,
-    Tag,
-    TagToRecipe
-)
+from recipes.models import (Ingredient, IngredientToRecipe, Recipe, Tag,
+                            TagToRecipe)
 from users.models import CustomUser
 
 
@@ -35,11 +29,11 @@ def tag_create(row):
 def recipe_create(row, author):
     ingredients = Ingredient.objects.all()
     tags = Tag.objects.all()
-    format, row[27] = row[27].split(';base64,')
-    ext = format.split('/')[-1]
+    data_format, image_data = row[27].split(';base64,')
+    ext = data_format.split('/')[-1]
     recipe = Recipe.objects.get_or_create(
         author=author[0],
-        image=ContentFile(base64.b64decode(row[27]), name='temp.' + ext),
+        image=ContentFile(base64.b64decode(image_data), name='temp.' + ext),
         name=row[28],
         text=row[29],
         cooking_time=row[30]

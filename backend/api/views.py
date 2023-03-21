@@ -1,13 +1,10 @@
 import io
 
-from django.conf import settings
 from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
@@ -20,6 +17,7 @@ from rest_framework.views import APIView
 
 from api.permissions import (IsAdminPermission,
                              IsAdminOrAuthorOrReadOnlyPermission)
+from api.pagination import PageLimitPagination
 from api.serializers import (IngredientSerializer, RecipeCreateSerializer,
                              RecipeReadSerializer, RecipeShortReadSerializer,
                              SetPasswordSerializer, SignUpUserSerializer,
@@ -46,6 +44,7 @@ class CustomUserViewSet(
     - получение детализации пользователя по его id.
     """
     queryset = CustomUser.objects.all()
+    pagination_class = PageLimitPagination
     permission_classes = (AllowAny,)
 
     def get_serializer_class(self):
@@ -179,7 +178,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     - удаление рецепта по его id.
     """
     queryset = Recipe.objects.all()
-    permission_classes = (IsAuthenticated,)
+    pagination_class = PageLimitPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
@@ -220,6 +219,68 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return delete(request, pk, ShoppingCart)
 
 
+@action(detail=False, permission_classes=(IsAuthenticated,))
+class ShoppingCardView(APIView):
+    """View-функция API для получения списка покупок в виде pdf-файла."""
+    def get(self, request):
+        """Обработка GET-запроса для получения списка покупок в виде pdf."""
+        recipes_in_shopping_list = Recipe.objects.filter(
+            recipe_on_shopping_cart__user=request.user
+        ).annotate(
+            sum_ingredients=Sum('recipe_to_ingredient__amount')
+        ).values_list(
+            'ingredients__name',
+            'ingredients__measurement_unit',
+            'sum_ingredients'
+        )
+        buffer = io.BytesIO()
+        pdf = canvas.Canvas(buffer)
+        pdfmetrics.registerFont(
+            TTFont(
+                name='Tantular',
+                filename='backend_static/fonts/Tantular.ttf',
+                asciiReadable='UTF-8'
+            )
+        )
+        font = 'Tantular'
+        x_position, y_position = 50, 800
+        pdf.setFont(font, 16)
+        if recipes_in_shopping_list:
+            indent = 30
+            pdf.drawString(
+                x=x_position,
+                y=y_position,
+                text='Ваш список ингредиентов для выбранных рецептов:'
+            )
+            for i, text in enumerate(recipes_in_shopping_list, start=1):
+                pdf.setFont(font, 14)
+                pdf.drawString(
+                    x=x_position,
+                    y=y_position - indent,
+                    text=f'{i}. {text[0].capitalize()} ({text[1]}) - {text[2]}'
+                )
+                y_position -= 15
+                if y_position <= 50:
+                    pdf.showPage()
+                    y_position = 800
+            pdf.save()
+            buffer.seek(0)
+            return FileResponse(
+                buffer, as_attachment=True, filename='shopping_list.pdf'
+            )
+        pdf.setFont(font, 24)
+        pdf.drawString(
+            x_position,
+            y_position,
+            'Ваш список покупок пуст.'
+        )
+        pdf.save()
+        buffer.seek(0)
+        return FileResponse(
+            buffer, as_attachment=True, filename='shopping_list.pdf'
+        )
+
+
 class TagViewSet(viewsets.ModelViewSet):
     """
     Вьюсет для реализации операций с моделью Tag:
@@ -239,45 +300,3 @@ class TagViewSet(viewsets.ModelViewSet):
         if self.action in ('create', 'update', 'destroy'):
             self.permission_classes = (IsAdminPermission,)
         return [permission() for permission in self.permission_classes]
-
-
-@action(detail=False, permission_classes=(IsAuthenticated,))
-class ShoppingCardView(APIView):
-    """View-функция API для получения списка покупок в виде pdf-файла."""
-    def get(self, request):
-        """Обработка GET-запроса для получения списка покупок в виде pdf."""
-        recipes_in_shopping_list = Recipe.objects.filter(
-            recipe_on_shopping_cart__user=request.user
-        ).annotate(
-            sum_ingredients=Sum('recipe_to_ingredient__amount')
-        ).values_list(
-            'ingredients__name',
-            'ingredients__measurement_unit',
-            'sum_ingredients'
-        )
-        buffer = io.BytesIO()
-        pdf = canvas.Canvas(buffer, pagesize=A4, bottomup=0)
-        font = 'Tantular'
-        pdfmetrics.registerFont(
-            TTFont('Tantular', 'backend_static/fonts/Tantular.ttf', 'UTF-8')
-        )
-        textobj = pdf.beginText()
-        textobj.setTextOrigin(inch, inch)
-        lines = []
-        lines.append('Ваш список ингредиентов для выбранных рецептов:')
-        textobj.setFont(font, 14)
-        lines.append('-' * settings.DIVIDING_LINE_LENGTH)
-        for i, recipe in enumerate(recipes_in_shopping_list, start=1):
-            lines.append(
-                f'{i}. {recipe[0].capitalize()} ({recipe[1]}) - {recipe[2]}'
-            )
-            lines.append(' ')
-        for line in lines:
-            textobj.textLine(line)
-        pdf.drawText(textobj)
-        pdf.showPage()
-        pdf.save()
-        buffer.seek(0)
-        return FileResponse(
-            buffer, as_attachment=True, filename='shopping_list.pdf'
-        )
