@@ -153,7 +153,7 @@ sudo docker compose exec backend python manage.py collectstatic --no-input
 ```
 sudo docker compose exec backend python manage.py createsuperuser
 ```
-9. Приложение активно и готово к использованию.
+9. Приложение активно и готово к использованию. Доступно по IP-адресу (домену) вашего текущего сервера.
 
 10. Для остановки контейнеров Docker:
 ```
