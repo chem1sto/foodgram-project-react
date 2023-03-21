@@ -149,7 +149,7 @@ sudo python manage.py upload ingredients.csv tags.csv
 ```
 sudo docker compose exec backend python manage.py collectstatic --no-input 
 ```
-8 Создайте суперпользователя:
+8. Создайте суперпользователя:
 ```
 sudo docker compose exec backend python manage.py createsuperuser
 ```
