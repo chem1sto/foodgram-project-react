@@ -1,12 +1,16 @@
 import os
+from distutils.util import strtobool
 from pathlib import Path
+from dotenv import load_dotenv 
 
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = os.getenv('PROD_FLAG')
+DEBUG = False if strtobool(os.getenv('PROD_FLAG')) else True
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
 
@@ -56,7 +60,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-if os.getenv('PROD_FLAG') is True:
+if strtobool(os.getenv('PROD_FLAG')):
     DATABASES = {
         'default': {
             'ENGINE': os.getenv('DB_ENGINE'),

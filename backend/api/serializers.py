@@ -319,6 +319,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 _('В рецепте указаны дублирующиеся ингредиенты.')
             )
+        if not all(ingred['amount'] >= 0 for ingred in ingred_to_recipe):
+            raise serializers.ValidationError(
+                _('Количество каждого ингредиента должно быть больше 0.')
+            )
         return super().validate(recipe)
 
     def create(self, validated_data):
