@@ -44,7 +44,10 @@
 
 **Документация по проекту доступна [по адресу](http://chemisto-blog.ddns.net/api/docs/)**.
 
-### Технологии
+### Автор
+- Владимир Васильев | [chem1sto](https://github.com/chem1sto)
+
+### Техно-стек
 - Python 3.10.6
 - Django 4.1.7
 - Django Rest Framework 3.14.0
@@ -164,6 +167,3 @@ sudo docker compose stop
 sudo docker compose down -v      # с удалением контейнеров и volumes
 sudo docker compose down         # без удаления volumes
 ```
-
-### Автор
-- Владимир Васильев | [chem1sto](https://github.com/chem1sto)
