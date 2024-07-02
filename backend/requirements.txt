@@ -9,4 +9,4 @@ PyJWT==2.6.0
 pytz==2022.7.1
 sqlparse==0.4.3
 webcolors==1.12
-reportlab==3.6.12
+reportlab~=3.6.13
